@@ -30,8 +30,8 @@ var ArticleSchema = new Schema({
     ref: 'User'
   },
   //Defining comment attribute
-  comment: {
-    type: String,
+  comments: {
+    type: Array,
     default: '',
     trim: true
   }

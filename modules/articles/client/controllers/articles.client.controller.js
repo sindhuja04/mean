@@ -10,9 +10,8 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
       // Create new Article object
       var article = new Articles({
         title: this.title,
-        content: this.content,
-        // added comment attribute to article object
-        comment: this.comment   
+        content: this.content
+           
       });
 
       // Redirect after save
@@ -47,9 +46,10 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
     // Update existing Article
     $scope.update = function () {
       var article = $scope.article;
-
+      article.comments = $scope.comments;
       article.$update(function () {
         $location.path('articles/' + article._id);
+        $scope.comments = "";
       }, function (errorResponse) {
         $scope.error = errorResponse.data.message;
       });
@@ -66,5 +66,8 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
         articleId: $stateParams.articleId
       });
     };
+    
+
+
   }
 ]);
