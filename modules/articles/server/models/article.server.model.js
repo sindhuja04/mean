@@ -28,6 +28,12 @@ var ArticleSchema = new Schema({
   user: {
     type: Schema.ObjectId,
     ref: 'User'
+  },
+  //Defining comment attribute
+  comment: {
+    type: String,
+    default: '',
+    trim: true
   }
 });
 
