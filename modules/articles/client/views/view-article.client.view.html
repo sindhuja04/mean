@@ -24,7 +24,8 @@
   <p data-ng-repeat="(key, value) in article.comments | filter:{status:'approved'}">{{value['data']}}</p>
 
   <div class="col-md-12">
-  <form name="articleForm" class="form-horizontal" data-ng-submit="update()" novalidate>
+
+  <form name="articleForm" class="form-horizontal" data-ng-submit="comment()" novalidate>
       <div class="form-group">
         <label class="control-label" for="comment">Comment</label>
         <div class="controls">
@@ -39,7 +40,8 @@
 
 <div data-ng-show="authentication.user._id == article.user._id">
   <h4 class="text-danger">Pending Comments</h4>
-    <p data-ng-repeat="(key, value) in article.comments | filter:{status:'pending'}"><a class="btn btn-success" href=""><i class="glyphicon glyphicon-ok"></i></a> {{value['data']}} </p>
+    <p data-ng-repeat="(key, value) in article.comments | filter:{status:'pending'}">
+    <a  ng-click="approveComment(value['_id'])" class="btn btn-success" href=""><i class="glyphicon glyphicon-ok"></i></a> {{value['data']}} </p>
 </div>
 
 </section>

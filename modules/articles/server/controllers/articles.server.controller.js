@@ -3,15 +3,15 @@
 /**
  * Module dependencies.
  */
-var path = require('path'),
-  mongoose = require('mongoose'),
-  Article = mongoose.model('Article'),
-  errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+ var path = require('path'),
+ mongoose = require('mongoose'),
+ Article = mongoose.model('Article'),
+ errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 /**
  * Create a article
  */
-exports.create = function (req, res) {
+ exports.create = function (req, res) {
   var article = new Article(req.body);
   article.user = req.user;
 
@@ -29,23 +29,19 @@ exports.create = function (req, res) {
 /**
  * Show the current article
  */
-exports.read = function (req, res) {
+ exports.read = function (req, res) {
   res.json(req.article);
 };
 
 /**
  * Update a article
  */
-exports.update = function (req, res) {
+ exports.update = function (req, res) {
   var article = req.article;
   var uuid = require('node-uuid');
   article.title = req.body.title;
-  article.content = req.body.content;
-  
-  if (req.body.comments){
-    article.comments.push({'_id': uuid.v4(), 'data': req.body.comments, 'status': 'pending', 'user': req.body.user });
-  }
-  
+  article.content = req.body.content;  
+  article.comments = req.body.comments;
   article.save(function (err) {
     if (err) {
       return res.status(400).send({
@@ -55,12 +51,13 @@ exports.update = function (req, res) {
       res.json(article);
     }
   });
+
 };
 
 /**
  * Delete an article
  */
-exports.delete = function (req, res) {
+ exports.delete = function (req, res) {
   var article = req.article;
 
   article.remove(function (err) {
@@ -74,10 +71,33 @@ exports.delete = function (req, res) {
   });
 };
 
+// approve comments
+exports.approve = function (req, res) {
+ var article = req.article;
+ var commentId = req.body.commentId;
+ var comments = [];
+ for (var i = 0, len = article.comments.length; i < len; i++) {
+  if (article.comments[i]._id === commentId){
+    article.comments[i].status = 'approved';
+  }
+  comments.push(article.comments[i]); 
+}
+res.json(comments); 
+};
+
+// post a  comment
+exports.comment = function (req, res) {
+ var article = req.article;
+ var uuid = require('node-uuid');
+ var comments = article.comments;
+ comments.push({'_id': uuid.v4(), 'data': req.body.comment, 'status': 'pending', 'user': req.body.user });
+res.json(comments); 
+};
+
 /**
  * List of Articles
  */
-exports.list = function (req, res) {
+ exports.list = function (req, res) {
   Article.find().sort('-created').populate('user', 'displayName').exec(function (err, articles) {
     if (err) {
       return res.status(400).send({
@@ -90,11 +110,10 @@ exports.list = function (req, res) {
 };
 
 
-
 /**
  * Article middleware
  */
-exports.articleByID = function (req, res, next, id) {
+ exports.articleByID = function (req, res, next, id) {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({

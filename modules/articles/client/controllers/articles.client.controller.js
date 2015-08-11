@@ -1,8 +1,8 @@
 'use strict';
 
 // Articles controller
-angular.module('articles').controller('ArticlesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Articles',
-  function ($scope, $stateParams, $location, Authentication, Articles) {
+angular.module('articles').controller('ArticlesController', ['$scope', '$http', '$stateParams', '$location', 'Authentication', 'Articles',
+  function ($scope,$http,$stateParams, $location, Authentication, Articles) {
     $scope.authentication = Authentication;
 
     // Create new Article
@@ -11,7 +11,7 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
       var article = new Articles({
         title: this.title,
         content: this.content
-           
+
       });
 
       // Redirect after save
@@ -67,7 +67,52 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
       });
     };
     
+    $scope.approveComment =  function(commentId){
+      var article = $scope.article;
+      $http({
+        url: 'api/articles/' + article._id + '/approve',
+        method: 'POST',
+        data: { 'commentId' : commentId }
+      })
+      .then(function(response) {
+            // success
+            article.comments = response.data;
+            article.$update(function () {
+              $location.path('articles/' + article._id);
+              $scope.comments = '';
+            }, function (errorResponse) {
+              $scope.error = errorResponse.data.message;
+            });
 
+          }, 
+          function(response) { 
+            // failed
+          });
+    };
+
+
+    $scope.comment = function(comment) {
+          var article = $scope.article;
+      $http({
+        url: 'api/articles/' + article._id + '/comment',
+        method: 'POST',
+        data: { 'comment' : $scope.comments }
+      })
+      .then(function(response) {
+            // success
+            article.comments = response.data;
+            article.$update(function () {
+              $location.path('articles/' + article._id);
+              $scope.comments = '';
+            }, function (errorResponse) {
+              $scope.error = errorResponse.data.message;
+            });
+
+          }, 
+          function(response) { 
+            // failed
+          });
+    };
 
   }
-]);
+  ]);
