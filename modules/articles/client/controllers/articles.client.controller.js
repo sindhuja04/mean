@@ -49,7 +49,7 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
       article.comments = $scope.comments;
       article.$update(function () {
         $location.path('articles/' + article._id);
-        $scope.comments = "";
+        $scope.comments = '';
       }, function (errorResponse) {
         $scope.error = errorResponse.data.message;
       });

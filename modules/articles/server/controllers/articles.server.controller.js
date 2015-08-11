@@ -38,9 +38,14 @@ exports.read = function (req, res) {
  */
 exports.update = function (req, res) {
   var article = req.article;
+  var uuid = require('node-uuid');
   article.title = req.body.title;
   article.content = req.body.content;
-  article.comments.push({'data': req.body.comments, 'status': 'pending'});
+  
+  if (req.body.comments){
+    article.comments.push({'_id': uuid.v4(), 'data': req.body.comments, 'status': 'pending', 'user': req.body.user });
+  }
+  
   article.save(function (err) {
     if (err) {
       return res.status(400).send({
