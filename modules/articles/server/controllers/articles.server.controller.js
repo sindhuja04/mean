@@ -90,7 +90,8 @@ exports.comment = function (req, res) {
  var article = req.article;
  var uuid = require('node-uuid');
  var comments = article.comments;
- comments.push({'_id': uuid.v4(), 'data': req.body.comment, 'status': 'pending', 'user': req.body.user });
+ var user = {'_id': req.user._id, 'displayName': req.user.displayName}
+ comments.push({'_id': uuid.v4(), 'data': req.body.comment, 'status': 'pending', 'user': user });
 res.json(comments); 
 };
 
