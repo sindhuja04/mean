@@ -90,8 +90,16 @@ exports.comment = function (req, res) {
  var article = req.article;
  var uuid = require('node-uuid');
  var comments = article.comments;
- var user = {'_id': req.user._id, 'displayName': req.user.displayName}
- comments.push({'_id': uuid.v4(), 'data': req.body.comment, 'status': 'pending', 'user': user });
+ var publishedAt = new Date();
+ var status = '';
+ if (req.article && req.user && req.article.user.id === req.user.id){
+  status = 'approved'
+  }
+  else{
+    status = 'pending'
+  }
+ var user = {'_id': req.user._id, 'displayName': req.user.displayName, 'profileImageURL': req.user.profileImageURL}
+ comments.push({'_id': uuid.v4(), 'data': req.body.comment, 'status': status, 'user': user, 'publishedAt': publishedAt });
 res.json(comments); 
 };
 

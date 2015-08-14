@@ -107,7 +107,7 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$http', 
             }, function (errorResponse) {
               $scope.error = errorResponse.data.message;
             });
-
+              $scope.flash_notify = true;
           }, 
           function(response) { 
             // failed

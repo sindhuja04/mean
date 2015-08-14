@@ -1,5 +1,10 @@
 <section data-ng-controller="ArticlesController" data-ng-init="findOne()">
   <div class="page-header">
+
+    <div class="alert alert-warning" role="alert" ng-if='authentication.user._id != article.user._id' ng-show="flash_notify">
+      <strong>Notice!</strong> Your comment pending. It will be displayed once the article owner approves!.
+    </div>
+
     <h1 data-ng-bind="article.title"></h1>
   </div>
   <div class="pull-right" data-ng-show="authentication.user._id == article.user._id">
@@ -19,29 +24,60 @@
     </em>
   </small>
   <p class="lead" data-ng-bind="article.content"></p>
-  <hr />
-  <h4 class="text-primary">Comments</h4>
-  <p data-ng-repeat="(key, value) in article.comments | filter:{status:'approved'}">{{value['data']}}</p>
 
-  <div class="col-md-12">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="page-header">
+        <h3 class="text-primary">Comments </h3>
+      </div> 
+      <div class="comments-list">
 
-  <form name="articleForm" class="form-horizontal" data-ng-submit="comment()" novalidate>
-      <div class="form-group">
-        <label class="control-label" for="comment">Comment</label>
-        <div class="controls">
-          <textarea name="comment" data-ng-model="comments" id="comment" class="form-control" cols="30" rows="10" placeholder="Comment"></textarea>
+       <div data-ng-repeat="(key, value) in article.comments | filter:{status:'approved'}" class="media">
+         <p class="pull-right"><small>{{value['publishedAt'] | date:'mediumDate' }}</small></p>
+         <a class="media-left" href="#">
+           <img src="{{value['user']['profileImageURL']}}" style="width: 48px; height: 48px;">
+         </a>
+         <div class="media-body">
+          <h4 class="media-heading user_name">{{value['user']['displayName']}}</h4>
+          {{value['data']}}
         </div>
       </div>
-      <div class="form-group">
-        <input type="submit" class="btn btn-default">
-      </div>
-    </form>
+    </div>
   </div>
-
-<div data-ng-show="authentication.user._id == article.user._id">
-  <h4 class="text-danger">Pending Comments</h4>
-    <p data-ng-repeat="(key, value) in article.comments | filter:{status:'pending'}">
-    <a  ng-click="approveComment(value['_id'])" class="btn btn-success" href=""><i class="glyphicon glyphicon-ok"></i></a> {{value['data']}} </p>
 </div>
+<div class="col-md-6">
+  <form name="articleForm" class="form-horizontal" data-ng-submit="comment()" novalidate>
+    <div class="form-group">
+      <label class="control-label" for="comment">Comment</label>
+      <div class="controls">
+        <textarea name="comment" data-ng-model="comments" id="comment" class="form-control" rows="3" placeholder="Comment"></textarea>
+      </div>
+    </div>
+    <div class="form-group">
+      <input type="submit" class="btn btn-default">
+    </div>
+  </form>
+</div>
+<div class="row" data-ng-show="authentication.user._id == article.user._id">
+  <div class="col-md-8">
+    <div class="page-header">
+      <h3 class="text-danger">Pending Comments </h3>
+    </div> 
+    <div class="comments-list">
 
+     <div data-ng-repeat="(key, value) in article.comments | filter:{status:'pending'}" class="media">
+       <p class="pull-right"><a ng-click="approveComment(value['_id'])" class="btn btn-success" href=""><i class="glyphicon glyphicon-ok"></i> Approve</a></p>
+       <a class="media-left" href="#">
+         <img src="{{value['user']['profileImageURL']}}" style="width: 48px; height: 48px;">
+       </a>
+       <div class="media-body">
+        <h4 class="media-heading user_name">{{value['user']['displayName']}}</h4>
+        {{value['data']}}
+        <p><small>{{value['publishedAt'] | date:'mediumDate' }}</small></p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<hr />
 </section>
